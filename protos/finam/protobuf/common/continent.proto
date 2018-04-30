@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+
+package finam.protobuf.common;
+
+option java_multiple_files = true;
+
+enum Continent {
+    CONTINENT_UNKNOWN = 0;
+    CONTINENT_AF = 1; // Africa
+    CONTINENT_AN = 2; // Antarctica
+    CONTINENT_AS = 3; // Asia
+    CONTINENT_EU = 4; // Europe
+    CONTINENT_NA = 5; // North America
+    CONTINENT_OC = 6; // Oceania
+    CONTINENT_SA = 7; // South America
+}

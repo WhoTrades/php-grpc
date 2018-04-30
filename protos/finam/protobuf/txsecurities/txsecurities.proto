@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package finam.protobuf.txsecurities;
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+import "google/protobuf/duration.proto";
+
+message Issue {
+    int64 id = 1;
+    map<int32, string> name = 2; // Язык (finam.protobuf.common.Lang) - имя инструмента
+    string ticker = 3;
+}
+
+message SecuritiesGroupTag {
+    int32 id = 1;
+    map<int32, string> names = 2;
+}
+
+message ServiceStats {
+    int32 indexed_terms = 1;
+    int32 indexed_issues = 2;
+    google.protobuf.Duration reindex_duration = 3;
+}

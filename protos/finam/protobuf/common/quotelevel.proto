@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package finam.protobuf.common;
+
+option java_multiple_files = true;
+option java_outer_classname = "QuoteLevelOuterClass";
+
+option objc_class_prefix = "FNM";
+
+//inspired from https://en.wikipedia.org/wiki/Financial_quote
+enum QuoteLevel {
+    LAST_PRICE = 0;
+    BEST_BID_OFFER = 1;
+    DEPTH_OF_MARKET = 2;
+    DEPTH_OF_BOOK = 3;
+    ACCESS_FORBIDDEN = 4;
+}
+

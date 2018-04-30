@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package finam.protobuf.common;
+
+option java_multiple_files = true;
+
+option objc_class_prefix = "FNM";
+
+import "finam/protobuf/common/tariff.proto";
+
+message AccountId {
+    string trade_code        = 1;
+    string trade_system_name = 2;
+}
+
+message Account {
+    enum Type {
+        UNDEFINED      = 0;
+        MMA            = 1;
+        ETNA           = 2;
+        MICEX          = 3;
+        MICEX_CURRENCY = 4;
+        FORTS          = 5;
+        UNION          = 6;
+        SPBEX          = 7;
+        USA            = 8;
+    }
+
+    enum OrderType {
+        MARKET = 0;
+        LIMIT  = 1;
+    }
+
+    // Счет в смысле блокировок может быть в четырех состояниях, по возрастанию уровня блокировки:
+    enum AccountStatus {
+        // понятно, все можно.
+        ACCOUNT_ACTIVE = 0;
+        // нельзя открывать позиции и выводить деньги. В это состояние попадают при маржин колле. Можно закрывать позиции, можно заводить деньги, но тратить их - нельзя.
+        ACCOUNT_RESTRICTED = 10;
+        // относительно редкая ситуация, когда ничего нельзя. Счет открыт, деньги и позиции на нем могут быть, но выставлять сделки нельзя никак.
+        ACCOUNT_BLOCKED = 20;
+        // ничего нельзя, счет закрыт, как будто нет его вообще. В таком состоянии как раз можно не показывать его.
+        ACCOUNT_CLOSED = 30;
+    }
+
+    AccountId          id           = 1;
+    bool               demo         = 2;
+    bool               readonly     = 3;
+    Type               type         = 4;
+    repeated Account   sub_accounts = 5;
+    repeated OrderType order_types  = 6;  // The list of allowed order types
+    bool               iis          = 7;
+
+    repeated Tariff    tariffs      = 8;
+    AccountStatus      status       = 9;
+}

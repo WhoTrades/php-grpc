@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package finam.protobuf.corporateactions;
+
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+option java_multiple_files = true;
+
+option objc_class_prefix = "FNM";
+
+//Corporate Actions http://www.investopedia.com/articles/03/081303.asp
+//https://en.wikipedia.org/wiki/Corporate_action
+service CorporateActions {
+    rpc GetEvents (GetEventsRequest) returns (EventsResponse) {}				// Разовый запрос событий по фильтру
+	// Комментим подписку, пока от потребителей не будет четких требований
+    // rpc SubscribeEvents (SubscribeEventsRequest) returns (stream Events) {}  // Подписка на события с определенной даты
+}
+
+// Фильтр для получения событий в из базы. Работает как конъюнкция указанных тут фильтров
+message EventFilter {
+	string eventcd 							= 1;	// фильтр по коду события
+	string isin 							= 2;	// фильтр по бумагам (isin)
+	string country	 						= 3;	// фильтр по стране (ISO 3166-1 alpha-2)
+	string exchange							= 4;	// фильтр по бирже (mic)
+	string ticker							= 5;	// фильтр по тикеру (localcode)
+	google.protobuf.Timestamp effectivedate = 6;	// фильтр по effectivedate
+	google.protobuf.Timestamp exdate		= 7;	// фильтр по exdate
+}
+
+// Запрос событий, удовлетворяющих фильтру filter и дате date. Дату, как и фильтры, можно не указывать.
+message GetEventsRequest {
+	EventFilter filter						= 1;	// фильтр
+	google.protobuf.Timestamp date			= 2;	// дата события (поле changed в базе)
+}
+
+// Запрос событий, удовлетворяющих фильтру filter, начиная с даты start_date. Если start_sate не указано, то произойдет подписка на события, пришедшие после момента подписки
+message SubscribeEventsRequest {
+	EventFilter filter						= 1;	// фильтр
+	google.protobuf.Timestamp start_date	= 2;	// с какой даты транслировать события (поле changed в базе)
+}
+
+// Ответ со списком событий, либо с ошибкой
+message EventsResponse {
+	google.rpc.Status status = 1;
+	Events data = 2;
+}
+
+// Корпоративное событие (Строка в таблице [Sources].[CA::Events])
+message Event {
+	int64 id										= 1;	// Порядковый номер в базе
+	google.protobuf.Timestamp created				= 2;	// Дата создания записи по событию
+	google.protobuf.Timestamp changed				= 3;	// Дата и время изменения записи
+	string actflag									= 4;	// Тип записи (добавление, изменение, отмена и удаление)
+	string eventcd									= 5;	// Код типа события
+	int64 eventid									= 6;	// ID события
+	int64 scexhid									= 7;	// ID группы событий в разрезе листинга ЦБ 
+	int64 optionid									= 8;	// ID варианта выплаты. Выплаты / начисления могут проводится несколькими способами (например, часть в дс, часть в цб). Способ уникален для события
+	int64 serialid									= 9;	// Порядковый номер в рамках способа выплаты (optionid). У события могут быть различные методы выплаты (например, разные даты)
+	string isin										= 10;	// ISIN код ЦБ
+	int64 secid										= 11;	// EDI код ЦБ. Необходим, т.к. встречаются ЦБ без ISIN
+	int64 issid										= 12;	// EDI код эмитента
+	string issuername								= 13;	// Наименование эмитента
+	string sectycd									= 14;	// Тип ЦБ
+	string localcode								= 15;	// Код ЦБ на бирже (exchgcd)
+	string mic										= 16;	// MIC (Market Identifier Code) код биржи
+	string exchgcntry								= 17;	// Страна (код по ISO 3166-1 alpha-2)
+	string exchgcd									= 18;	// EDI код биржи. Необходим, т.к. попадаются (редко) сообщения без MIC кода
+	string primaryexchgcd							= 19;	// Основная биржа для листинга ЦБ
+	google.protobuf.Timestamp recdate				= 20;	// Дата закрытия реестра (отсечки) или дата начала периода закрытия реестра 
+	google.protobuf.Timestamp todate				= 21;	// Дата окончания периода закрытия реестра (при наличии)
+	google.protobuf.Timestamp registrationdate		= 22;	// Последняя дата, к которой акционеры должны представить свои ЦБ, чтобы участвовать в событии
+	google.protobuf.Timestamp effectivedate			= 23;	// Дата вступления в силу (когда произойдет событие)
+	string XMLdata									= 24;	// В данном поле, в виде xml строки, должно отображаться оригинальное событие (со всеми полями)
+}
+
+message Events {
+	repeated Event events 			= 1;
+}

@@ -1,0 +1,175 @@
+syntax = "proto3";
+
+package finam.protobuf.txsecurities;
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+import "finam/protobuf/txsecurities/txsecurities.proto";
+import "finam/protobuf/common/country.proto";
+import "finam/protobuf/common/lang.proto";
+import "finam/protobuf/common/exchange.proto";
+import "finam/protobuf/common/currency.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+import "finam/protobuf/transaq/extstruct.proto";
+
+enum CFICategory {
+    UNKNOWN_CATEGORY = 0;
+    EQUITIES = 1;
+    COLLECTIVE_INVESTMENT_VEHICLES = 2;
+    DEBT_INSTRUMENTS = 3;
+    ENTITLEMENT = 4;
+    LISTED_OPTIONS = 5;
+    FUTURES = 6;
+    SWAPS = 7;
+    NONLISTED_AND_COMPLEX_LISTED_OPTIONS = 8;
+    SPOT = 9;
+    FORWARDS = 10;
+    STRATEGIES = 11;
+    FINANCING = 12;
+    REFERENTIAL_INSTRUMENTS = 13;
+    MISCELLANEOUS = 14;
+}
+
+message ClientSecurity {
+    int64 id = 1;
+    string name = 2;
+    string ticker = 3;
+    int64 decimal_place = 4;
+    string mic = 5;
+    string country = 6;
+    string city = 7;
+    string isin = 8; //  https://en.wikipedia.org/wiki/International_Securities_Identification_Number
+    string cfi = 9; // тип инструмента,  ISO 10962(CFI), https://en.wikipedia.org/wiki/ISO_10962
+    string cusip = 10; //  https://en.wikipedia.org/wiki/CUSIP
+    int64 shares_outstanding = 11;
+    int64 market_capitalization = 12;
+    int64 lot_size = 13;
+    CFICategory cfi_category = 14;
+    //    string cfi_group_description = 15;
+    //    string cfi_attr1_description = 16;
+    //    string cfi_attr2_description = 17;
+    //    string cfi_attr3_description = 18;
+    //    string cfi_attr4_description = 19;
+    string regime = 20;
+    repeated string group_id = 21;
+    finam.protobuf.common.Currency currency = 22;
+    repeated int64 indexes = 23;
+    double weight = 100;
+    ClientQuote quote = 200;
+    finam.protobuf.transaq.Security transaq_security = 300;
+}
+
+message ClientQuote {
+    int64 last_time = 4;
+    double price = 5;
+    double chg = 6;
+    double w52low = 7;
+    double w52high = 8;
+    double last = 9;
+    double volume = 10;
+    double close = 11;
+    double usd_multiplier = 12; // умножить на это чтобы получить баксы
+}
+
+message SecuritiesSearchRequest {
+    finam.protobuf.common.Lang lang = 1;
+    string query = 2; // если пусто - вернет все бумаги
+    int32 limit = 3;
+    repeated string allowed_mics = 4; // если пусто - вернет без ограничений по mic
+    repeated finam.protobuf.common.Country allowed_countries = 5; // если пусто - вернет без ограничений по странам
+    repeated string allowed_groups = 6; // если пусто - вернет без ограничений по группам транзака
+    google.protobuf.DoubleValue min_price = 7;
+    google.protobuf.DoubleValue max_price = 8;
+}
+
+message SecuritiesSearchResponse {
+    repeated ClientSecurity issues = 2;
+    int32 total_find_issues = 3;
+}
+
+message SecuritiesLookupRequest {
+    finam.protobuf.common.Lang lang = 1;
+    int64 id = 2 [deprecated=true];
+    string ticker = 3;
+    string mic = 4;
+    finam.protobuf.common.Country country = 5;
+    string isin = 6;
+    string cfi = 7;
+    string cusip = 8;
+    string group_id = 9;
+    string regime = 10;
+    int32 limit = 11;
+    repeated int64 ids = 12;
+    google.protobuf.DoubleValue min_price = 13;
+    google.protobuf.DoubleValue max_price = 14;
+}
+
+message SecuritiesLookupResponse {
+    repeated ClientSecurity issues = 2;
+}
+
+message AvailableExchangesResponse {
+    repeated finam.protobuf.common.Exchange exchanges = 2;
+}
+
+message MoversRequest {
+    repeated string allowed_mics = 1; // если пусто - вернет без ограничений по mic
+    repeated finam.protobuf.common.Country allowed_countries = 2; // если пусто - вернет без ограничений по странам
+    repeated string allowed_groups = 3; // если пусто - вернет без ограничений по группам транзака
+    finam.protobuf.common.Lang lang = 4;
+    int32 limit = 5;
+}
+
+message MoversResponse {
+    repeated ClientSecurity gainers = 2;
+    repeated ClientSecurity losers = 3;
+}
+
+message TransaqMarket {
+    int32 id = 1;
+    map<int32, string> names = 2;
+    int32 enum = 3;
+}
+
+enum SecuritiesGroupType {
+    TRANSAQ = 0;
+    CUSTOM = 1;
+}
+
+message SecuritiesGroup {
+    string letter = 1;
+    map<int32, string> names = 2;
+    string id = 3;
+    TransaqMarket market = 4;
+    int32 securities_count = 5;
+    SecuritiesGroupType group_type = 6;
+    repeated SecuritiesGroupTag tags = 7;
+}
+
+message AvailableGroupsResponse {
+    repeated SecuritiesGroup groups = 2;
+}
+
+service TXSecuritiesClient {
+    // доступные группы
+    rpc AvailableGroups (google.protobuf.EmptyMessage) returns (AvailableGroupsResponse);
+    // доступные мики
+    rpc AvailableExchanges (google.protobuf.EmptyMessage) returns (AvailableExchangesResponse);
+    // лидеры роста и падения
+    rpc GetMovers (MoversRequest) returns (MoversResponse);
+    //Запрос на поиск инструментов
+    rpc Search (SecuritiesSearchRequest) returns (SecuritiesSearchResponse) {
+        option (google.api.http).get = "/v1/txsecurities/search/{lang}/{query}";
+    };
+    // Запрос на точный поиск инструмента
+    rpc Lookup (SecuritiesLookupRequest) returns (SecuritiesLookupResponse) {
+        option (google.api.http).get = "/v1/txsecurities/lookup";
+    };
+    // не для публичного использования
+    rpc Stats (google.protobuf.EmptyMessage) returns (finam.protobuf.txsecurities.ServiceStats);
+    // не для публичного использования
+    rpc Restart (google.protobuf.EmptyMessage) returns (google.protobuf.EmptyMessage);
+}

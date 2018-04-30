@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package finam.protobuf.common;
+
+option java_multiple_files = true;
+
+option objc_class_prefix = "FNM";
+
+import "finam/protobuf/common/types.proto";
+
+enum TariffStatus {
+    TARIFF_STATUS_UNKNOWN = 0;
+    TARIFF_STATUS_ACTIVE = 1;
+    TARIFF_STATUS_PENDING = 2;
+    TARIFF_STATUS_INACTIVE = 3;
+}
+
+message Tariff {
+    string code = 1;
+    string title = 2;
+    TariffStatus status = 3;
+    DecimalValue trade_tax = 4;
+    string descr = 5;
+}

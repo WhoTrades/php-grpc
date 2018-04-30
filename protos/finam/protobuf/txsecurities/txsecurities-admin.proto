@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package finam.protobuf.txsecurities;
+
+option java_multiple_files = true;
+
+import "finam/protobuf/txsecurities/txsecurities.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+
+message StatsResponse {
+    map<string,finam.protobuf.txsecurities.ServiceStats> stats = 1;
+}
+
+enum IndexedFieldName {
+    TICKER = 0;
+    NAME = 1;
+    COUNTRY = 2;
+    MARKET = 3;
+    MARKET_TYPE = 4;
+    MIC = 5;
+    CITY = 6;
+    CFI_CATEGORY = 7;
+}
+
+message IndexedField {
+    IndexedFieldName field = 1;
+    float weight = 2;
+}
+
+message ConfigRequest {
+    enum Action {
+        GET = 0;
+        SET = 1;
+    }
+    Action action = 1;
+    repeated string mics = 2;
+    repeated IndexedField indexed_fields = 3;
+    int32 max_distance = 4;
+}
+
+message ConfigResponse {
+    repeated string mics = 1;
+    repeated IndexedField indexed_fields = 2;
+    int32 max_distance = 3;
+}
+
+message AliasesRequest {
+    enum Action {
+        LIST = 0;
+        ADD = 1;
+        REMOVE = 2;
+    }
+    Action action = 1;
+    string name = 2;
+    IndexedFieldName field = 3;
+    string alias = 4;
+}
+
+message AliasesResponse {
+    repeated string aliases = 1;
+}
+
+message AliasesNamesRequest {
+    IndexedFieldName field = 1;
+}
+
+message AliasesNamesResponse {
+    repeated string names = 1;
+}
+
+message CustomGroupTagRequest {
+    enum Action {
+        LIST = 0;
+        ADD = 1;
+        REMOVE = 2;
+    }
+    Action action = 1;
+    SecuritiesGroupTag tag = 2;
+}
+
+message CustomGroupTagResponse {
+    repeated SecuritiesGroupTag tags = 1;
+}
+
+message CustomGroupDefinition {
+    string id = 1;
+    map<int32, string> names = 2;
+    repeated int32 tags = 3;
+}
+
+message CustomGroupRequest {
+    enum Action {
+        LIST = 0;
+        ADD = 1;
+        REMOVE = 2;
+    }
+    Action action = 1;
+    CustomGroupDefinition group = 2;
+}
+
+message CustomGroupResponse {
+    repeated CustomGroupDefinition groups = 1;
+}
+
+message GroupContentRequest {
+    enum Action {
+        ADD = 0;
+        REMOVE = 1;
+    }
+    Action action = 1;
+    string group_id = 2;
+    int64 security_id = 3;
+}
+
+message GroupContentResponse {
+    string group_id = 1;
+    repeated int64 security_ids = 2;
+}
+
+message GroupInfo {
+    string id = 1;
+    int32 index = 2;
+    bool exclude = 3;
+}
+
+message GroupsInfo {
+    repeated GroupInfo infos = 1;
+}
+
+service TXSecuritiesAdmin {
+    rpc Stats (google.protobuf.EmptyMessage) returns (StatsResponse);
+    rpc Reindex (google.protobuf.EmptyMessage) returns (google.protobuf.EmptyMessage);
+    rpc Config (ConfigRequest) returns (ConfigResponse);
+    rpc Aliases (AliasesRequest) returns (AliasesResponse);
+    rpc AliasesNames (AliasesNamesRequest) returns (AliasesNamesResponse);
+    rpc Tags (CustomGroupTagRequest) returns (CustomGroupTagResponse);
+    rpc Groups (CustomGroupRequest) returns (CustomGroupResponse);
+    rpc GroupContent (GroupContentRequest) returns (GroupContentResponse);
+    rpc GetGroupsInfo (google.protobuf.EmptyMessage) returns (GroupsInfo);
+    rpc SetGroupsInfo (GroupsInfo) returns (google.protobuf.EmptyMessage);
+}

@@ -1,0 +1,424 @@
+﻿syntax = "proto3";
+
+package finam.protobuf.transaq;
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+enum MarketsMask {
+    MKT_NONE    = 0;        // Нет рынка                    // ----- 30/04/2015 Bld 65.18+ -----
+    MKT_ZALOGI  = 1;        // Залоговые инструменты
+    MKT_FOND    = 2;        // Фондовый рынок ММВБ
+    MKT_FOB     = 4;        // Срочная секция ММВБ
+    MKT_EXT     = 8;        // Внешние системы
+    MKT_FUT     = 16;       // FORTS Futures
+    MKT_OPT     = 32;       // FORTS Options
+    MKT_GKO     = 64;       // Рынок ГЦБ ММВБ
+//  MKT_SGK     = 128;      // RTS SGK                      ----- UNUSED 01/09/2015 Bld 66.10+ -----
+    MKT_INF     = 256;      // INFO GATE
+    MKT_XETRA   = 512;      // XETRA gate
+    MKT_USv     = 1024;     // USv gate
+//  MKT_RTSv    = 2048;     // RTSv gate                    ----- UNUSED 23/08/2016 Bld 66.84+ -----
+    MKT_USA     = 4096;     // real North America gate      // 8/09/2011 USA
+    MKT_MCT     = 8192;     // Contract Market gate         // 12/12/2012 MCT
+    MKT_ETS     = 16384;    // Валютный рынок ММВБ          // 07/02/2013 ETS
+    MKT_SPB     = 32768;    // SPBex                        ----- 01/09/2015 Bld 66.10+ -----
+    MKT_ALL     = 65535;
+}
+
+message MoneyRegister {         //  Регистр денежных средств
+    string  registr      = 1;   //  Код регистра учета "C", "T0", "Y0", "Y1", "Y2", "Y3", "R" или "" для общих данных по деньгам.
+    double  open_balance = 2;   //  входящее сальдо,    руб.коп
+    double  bought       = 3;   //  Куплено,            руб.коп
+    double  sold         = 4;   //  Продано,            руб.коп
+    double  settled      = 5;   //  Исполнено,          руб.коп
+    double  balance      = 6;   //  Текущая позиция,    руб.коп
+}
+
+message UnionMoneyRow {                 // Денежная позиция
+    string   name               = 1;    // Наименование вида денег
+    double   fees               = 2;    // Комиссии,            руб.коп
+    repeated MoneyRegister rows = 3;    // Массив структур "Регистр денежных средств"
+}
+
+message DepoRegister {          //  Регистр DEPO
+    string  registr      = 1;   //  Код регистра учета "C", "T0", "Y0", "Y1", "Y2", "Y3", "R" или "" для общих данных по деньгам.
+    int64   open_balance = 2;   //  входящее сальдо,    шт.
+    int64   bought       = 3;   //  Куплено,            шт.
+    int64   sold         = 4;   //  Продано,            шт.
+    int64   settled      = 5;   //  Исполнено,          шт.
+    int64   balance      = 6;   //  Текущая позиция,    шт.
+    int64   buy          = 7;   //  Покупка,            шт.
+    int64   sell         = 8;   //  Продажа,            шт.
+}
+
+message UnionDepoRow {                  //  DEPO позиция
+    string      ba_code         = 1;    //  Код базового актива
+    string      ba_name         = 2;    //  Имя базового актива
+    double      setoff_rate     = 3;    //  Ставка перекрытия
+    double      init_req        = 4;    //  Плановый риск,      руб.коп
+    double      maint_req       = 5;    //  Минимальная маржа,  руб.коп
+    MarketsMask market          = 6;    //  Рынок инструмента
+    string      isin            = 7;    //  Код инструмента
+    string      currency        = 8;
+    double      rate            = 9;    //  Тек. цена,      руб.коп в валюте инструмета
+    double      equity          = 10;   //  Оценка позиции по инструменту,      руб.коп
+    double      reg_equity      = 11;   //  Стоимость в обеспечении портфеля нормативная,       руб.коп
+    double      risk_rate_long  = 12;   //  Ставка риска для лонгов, %
+    double      risk_rate_short = 13;   //  Ставка риска для шортов, %
+    double      reserve_long    = 14;   //  Ставка резерва для лонгов, %
+    double      reserve_short   = 15;   //  Ставка резерва для шортов, %
+    double      pl_init         = 16;   //  Приб/убыт по входящ,                руб.коп
+    double      pl_day          = 17;   //  Приб/убыт по сделкам,               руб.коп
+    double      pl              = 18;   //  Приб/убыт,                          руб.коп
+    int64       max_buy         = 19;   //  Макс. купить,                       лот
+    int64       max_sell        = 20;   //  Макс. продать,                      лот
+
+    repeated  DepoRegister rows = 21;   //  Массив структур "Регистр DEPO"
+
+    double      init_rate       = 22;   //  Вх. цена, руб.коп в валюте инструмета
+
+    double pos_avg_price        = 23;   //  Ср. цена позиции (в валюте инструмента)
+    double unrealized_pnl       = 24;   //  Приб/убыт по средней цене (в валюте портфеля), руб.коп
+}
+
+message PortfolioUnion {         //  Оценки состояния портфеля ЕДП
+    string  alias       = 1;     //  Клиент
+    double  open_equity = 2;     //  Портфель входящий,          руб.коп
+    double  equity      = 3;     //  Портфель текущий,           руб.коп
+    double  chrgoff_ir  = 4;     //  Корреляционный вычет планового риска
+    double  init_req    = 5;     //  Плановый риск (размер начальных требований)
+    double  chrgoff_mr  = 6;     //  Корреляционный вычет минимальных требований
+    double  main_req    = 7;     //  Размер минимальных требований
+    double  reg_equity  = 8;     //  Стоимость портфеля нормативная
+    double  reg_ir      = 9;     //  Плановая начальная маржа нормативная
+    double  reg_mr      = 10;    //  Минимальная маржа нормативная
+    double  vm          = 11;    //  Вариационная маржа FORTS
+    double  fin_res     = 12;    //  Финансовый результат последнего клиринга FORTS
+    double  go          = 13;    //  Размер требуемого ГО, посчитанный биржей FORTS
+    string  union_code  = 14;    //  Код юниона       ----- 13/11/2015 Bld 66.22+ -----
+    string  union_name  = 15;    //  Имя юниона       ----- 13/11/2015 Bld 66.22+ -----
+
+    //  Денежные позиции юниона
+    repeated UnionMoneyRow  money_rows = 16;   //  Массив структур "Денежная позиция"
+
+    //  DEPO позиции юниона
+    repeated UnionDepoRow   depo_rows  = 17;   //  Массив структур "DEPO позиция"
+
+    double  vm_mma      = 18;    //  Вариационная маржа по Фьючерсам MMA
+}
+
+message MCTDepoRow {                    //  DEPO позиция
+    string  isin               = 1;     //  Код инструмента
+    string  security_currency  = 2;     //  валюта цены
+    double  go_rate            = 3;     //  Ставка ГО клиента для инструмента, .00 %%
+    double  rate               = 4;     //  Текущая цена контракта (в валюте контракта)
+    double  cross_rate         = 5;     //  Кросс курс валюты портфеля к валюте контракта
+    double  init_rate          = 6;     //  Входящая цена контракта (цена последнего клиринга)
+    double  cross_rate_in      = 7;     //  Входящий кросс-курс валюты портфеля к валюте контракта
+    int64   open_balance       = 8;     //  Входящее сальдо,                    шт.
+    int64   bought             = 9;     //  Куплено,                            шт.
+    int64   sold               = 10;    //  Продано,                            шт.
+    int64   balance            = 11;    //  Текущая позиция,                    шт.
+    int64   ord_buy            = 12;    //  Заявлено купить,                    шт.
+    int64   ord_sell           = 13;    //  Заявлено продать,                   шт.
+    double  pos_cost           = 14;    //  Стоимость позиции,                  руб.коп
+    double  go_pos             = 15;    //  ГО позиции,                         руб.коп
+    double  go_plan            = 16;    //  Плановое ГО,                        руб.коп
+    double  tax                = 17;    //  Комиссия,                           руб.коп
+    double  pl_init            = 18;    //  Приб/убыт по входящ,                руб.коп
+    double  pl_day             = 19;    //  Приб/убыт по сделкам,               руб.коп
+    int64   max_buy            = 20;    //  Макс. купить,                       лот
+    int64   max_sell           = 21;    //  Макс. продать,                      лот
+    double  bought_average     = 22;    //  Ср. цена покупки
+    double  sold_average       = 23;    //  Ср. цена продажи
+    double  go_rate_long       = 24;    //  Ставка ГО Long клиента для инструмента, .00 %%
+    double  go_rate_short      = 25;    //  Ставка ГО Short клиента для инструмента, .00 %%
+    double  security_go_rate   = 26;    //  Ставка ГО по инструменту без клиента, .00 %%
+
+    double pos_avg_price       = 27;    //  Ср. цена позиции (в валюте инструмента)
+    double unrealized_pnl      = 28;    //  Приб/убыт по средней цене (в валюте портфеля), руб.коп
+}
+
+message PortfolioMCT {                  //  Оценки состояния портфеля MCT
+    string  alias               = 1;    //  Клиент
+    string  portfolio_currency  = 2;    //  Валюта портфеля клиента
+
+    //  Денежные позиции клиента
+    double     open_balance     = 3;    //  Входящее сальдо,            руб.коп
+    double     tax              = 4;    //  Комиссия,                   руб.коп
+    double     PL_init          = 5;    //  Приб/убыт по входящ,        руб.коп
+    double     PL_day           = 6;    //  Приб/убыт по сделкам,       руб.коп
+    double     capital          = 7;    //  Текущая позиция (капитал),  руб.коп
+
+    //  Состояние счета клиента
+    double     utilization_fact = 8;    //  Использование капитала, факт .0 %%
+    double     utilization_plan = 9;    //  Использование капитала, план .0 %%
+    double     coverage_fact    = 10;   //  Обеспеченность факт,         .0 %%
+    double     coverage_plan    = 11;   //  Обеспеченность план,         .0 %%
+    double     go_mm            = 12;   //  Мин. маржа, руб.коп
+
+    //  DEPO позиции клиента
+    repeated MCTDepoRow depo_rows = 13; //  Массив структур "DEPO позиция"
+
+    int32      cln_kgo          = 14;   //  КГО клиента, XX. %%
+}
+
+
+message TPlusMoneyRow {
+    string  registr      = 1;   //  Код регистра учета "C", "T0", "Y0", "Y1", "Y2", "Y3", "R" или "" для общих данных по деньгам.
+    double  open_balance = 2;   //  входящее сальдо,    руб.коп
+    double  bought       = 3;   //  Куплено,            руб.коп
+    double  sold         = 4;   //  Продано,            руб.коп
+    double  settled      = 5;   //  Исполнено,          руб.коп
+    double  balance      = 6;   //  Текущая позиция,    руб.коп
+    double  tax          = 7;   //  Комиссия,           руб.коп
+    double  ord_buy      = 8;   //  Заблокировано под покупки,  руб.коп
+}
+
+
+message TPlusDepoRow {
+    string  isin              = 1;     //  Код инструмента
+    string  registr           = 2;     //  Код регистра учета "C", "T0", "Y0", "Y1", "Y2", "Y3", "R" или "" для общих данных по инструменту.
+    double  rate              = 3;     //  Тек. цена
+    int64   open_balance      = 4;     //  Входящее сальдо,                     шт.
+    int64   bought            = 5;     //  Куплено,                             шт.
+    int64   sold              = 6;     //  Продано,                             шт.
+    int64   settled           = 7;     //  Исполнено                            шт.
+    int64   balance           = 8;     //  Текущая позиция,                     шт.
+    int64   ord_buy           = 9;     //  Заявлено купить,                     шт.
+    int64   ord_sell          = 10;    //  Заявлено продать,                    шт.
+    double  cover             = 11;    //  Вклад бумаги в плановое обеспечение, руб.коп
+    double  init_margin       = 12;    //  Плановая нач. маржа,                 руб.коп
+    double  pl_init           = 13;    //  Приб/убыт по входящ,                 руб.коп
+    double  pl_day            = 14;    //  Приб/убыт по сделкам,                руб.коп
+    int64   max_sell          = 16;    //  Макс. продать,                       лот
+    int64   max_buy           = 15;    //  Макс. купить,                        лот
+    double  risk_rate         = 17;    //  Ставка риска клиента для инструмента, .00%%
+    double  valuation         = 18;    //  Оценка позиции по инструменту,      руб.коп
+
+    double  risk_rate_long    = 19;    //  Ставка риска Long клиента для инструмента,  .00%%
+    double  risk_rate_short   = 20;    //  Ставка риска Short клиента для инструмента, .00%%
+
+    MarketsMask    market     = 21;    //  Рынок инструмента
+
+    double pos_avg_price      = 22;    //  Ср. цена позиции (в валюте инструмента)
+    double unrealized_pnl     = 23;    //  Приб/убыт по средней цене (в валюте портфеля), руб.коп
+}
+
+
+message PortfolioTPlus {
+    string    alias               = 1;             //  Клиент
+    double    coverage_fact       = 2;             //  Обеспеченность фактическая,  .00%%
+    double    coverage_plan       = 3;             //  Обеспеченность плановая,     .00%%
+    double    open_equity         = 4;             //  Портфель входящий,           руб.коп
+    double    equity              = 5;             //  Портфель текущий,            руб.коп
+    double    cover               = 6;             //  Плановое обеспечение, оценка ликв. ст-ти портфеля,  руб.коп
+    double    init_margin         = 7;             //  Плановая нач. маржа, оценка портфельного риска,     руб.коп
+    double    pl_init             = 8;             //  Приб/убыт по входящ,        руб.коп
+    double    pl_day              = 9;             //  Приб/убыт по сделкам,       руб.коп
+    double    leverage_fact       = 10;            //  Факт. плечо в T+
+    double    coverage_critical   = 11;            //  Обеспеченность критическая,  .00%%
+    repeated  TPlusMoneyRow money_rows = 12;       //  Массив структур "Денежная позиция"
+    repeated  TPlusDepoRow depo_rows   = 13;       //  Массив структур "DEPO позиция"
+}
+
+
+message FortsClientHoldingsRow {
+    string  isin                   = 1;      // Код инструмента
+    string  short_name             = 2;      // Краткое наименование инструмента
+    int64   start_net              = 3;      // входящая позиция
+    int64   today_buy              = 4;      // куплено
+    int64   today_sell             = 5;      // продано
+    int64   total_net              = 6;      // текущая позиция
+    int64   buy                    = 7;      // заявлено купить
+    int64   sell                   = 8;      // заявлено продать
+    double  oper_margin            = 9;      // операционная маржа
+    int64   expiration_pos         = 10;     // заявлено к экспирации, (-1) - не экспирируется
+    int64   expiration_id          = 11;     // № заявки на экспирацию, если m_lgExpirationPos != (-1)
+    double  go                     = 12;     // ГО позиции
+    double  opt_margin             = 13;     // маржа по маржируемым опционам
+    int64   spot_netto             = 14;     // спот: нетто-позиция
+    int64   spot_sell_limit        = 15;     // спот: лимит продажи
+    int64   spot_used_sell_limit   = 16;     // спот: использованный лимит продажи
+    double  kgo                    = 17;     // Коэффициент клиентского ГО
+
+    double  rate                   = 18;     // Текущая цена контракта
+                                             // Внимание! Цена контракта берется из рыночных данных и может
+                                             //  быть рассинхронизована с остальными параметрами позиции.
+}
+
+
+message FortsClientHoldings {
+    string  alias                        = 1;    //    клиент
+    double  mny_current                  = 2;    //    Деньги текущие (валюта.сотые)
+    double  mny_reserved                 = 3;    //    Деньги заблокированные (валюта.сотые)
+    double  mny_free                     = 4;    //    Деньги свободные (валюта.сотые)
+    double  dep_current                  = 5;    //    Залоги текущие (валюта.сотые)
+    double  dep_reserved                 = 6;    //    Залоги заблокированные (валюта.сотые)
+    double  dep_free                     = 7;    //    Залоги свободные (валюта.сотые)
+    double  spot_buy_limit               = 8;    //    СПОТ: лимит покупки
+    double  used_spot_buy_limit          = 9;    //    СПОТ: использованный лимит покупки
+
+    repeated FortsClientHoldingsRow rows = 10;   //  Массив структур "FORTS позиция по инструменту"
+}
+
+
+message FortsClientLimits {
+    string  alias                = 1;     //   Клиент
+    double  coverage             = 2;     //   Обеспеченность, %
+    double  kfl                  = 3;     //   Коэфф. ликвидности
+    double  dohod                = 4;     //   Доход
+    double  mny_current          = 5;     //   Деньги текущие
+    double  mny_reserv           = 6;     //   Деньги заблокированные
+    double  mny_free             = 7;     //   Деньги свободные
+    double  depo_current         = 8;     //   Залоги текущие
+    double  depo_reserv          = 9;     //   Залоги заблокированные
+    double  depo_free            = 10;    //   Залоги свободные
+    double  prem                 = 11;    //   Премия по опционам
+    double  loss                 = 12;    //   Биржевой сбор
+    double  var_marg             = 13;    //   Вар. маржа (только отрицательная по закрытым позициям)
+    double  oper_marg            = 14;    //   Опер. маржа
+    double  pcl_marg             = 15;    //   Пром. вар. маржа
+    double  opt_marg             = 16;    //   Опц. маржа
+    double  buy_spot_limit       = 17;    //   СПОТ лимит (покупка)
+    double  used_buy_spot_limit  = 18;    //   СПОТ лимит использованный (покупка)
+}
+
+
+message PortfolioForts {
+    FortsClientHoldings holdings = 1;
+    FortsClientLimits   limits   = 2;
+}
+
+message Portfolio
+{
+    oneof portfolio
+    {
+        PortfolioUnion portfolio_union = 1;
+        PortfolioTPlus portfolio_tplus = 2;
+        PortfolioForts portfolio_forts = 3;
+        PortfolioMCT   portfolio_mct   = 4;
+    }
+}
+
+message Order {
+    // To be filled later
+}
+
+message Trade {
+    // To be filled later
+}
+
+
+message Security {
+
+    enum Type {
+        Share        = 0;      // Акции
+        Bond         = 1;      // Облигации
+        GkoOfz       = 2;      // ГКО ММВБ
+        MoexFuture   = 3;      // Фьючерсы ММВБ
+        FortsFuture  = 4;      // Фьючерсы FORTS
+        FortsOption  = 5;      // Опционы FORTS
+        Index        = 7;      // Индексы
+        Quote        = 8;      // Котировки
+        CurrencyPair = 9;      // Валютные пары
+        ADR          = 10;
+        NYSE         = 11;
+        METAL        = 12;
+        OIL          = 13;
+        MCT          = 14;
+        ETS          = 15;
+        ETS_SWAP     = 16;
+    }
+
+    enum PropertiesMask {
+        Nothing                  = 0;
+        TradesOnExchange         = 1;      // 0x01 – Инструмент торгуется на Бирже
+        TradesOnBroker           = 2;      // 0x02 – Инструмент допущен к торгам у Брокера - существенно для НЕ ГЛАВНЫХ трейдеров,
+                                           //        главным доступны все инструменты, торгуемые на биржах
+        MarketOrdersIsPermitted  = 4;      // 0x04 – Рыночные заявки (без ограничения по цене) разрешены
+        Margin                   = 8;      // 0x08 – Признак маржинальности бумаги
+        OptionCall               = 16;     // 0x10 – опцион Call
+        OptionPut                = 32;     // 0x20 – опцион Put (0x10 | 0x20 – фьючерс)
+        PermittedForResidents    = 64;     // 0x40 – разрешен для резидентов
+        PermiteedForNonResidents = 128;    // 0x80 – разрешен для нерезидентов
+    }
+
+    enum Currency {
+        RUB = 0;
+        EUR = 1;
+        USD = 2;
+        JPY = 3;
+        GBP = 4;
+        CHF = 5;
+        CAD = 6;
+        CNY = 7;
+        INR = 8;
+        UAH = 9;
+        HKD = 10;
+        KRW = 11;
+        BRL = 12;
+        MXN = 13;
+        ZAR = 14;
+        SGD = 15;
+        AUD = 16;    //  Австралийский доллар
+        DKK = 17;    //  Датская крона
+        SEK = 18;    //  Шведская крона
+        ISK = 19;    //  Исландская крона
+        TWD = 20;    //  Тайваньский доллар
+        PLN = 21;    //  Польский злотый
+        KZT = 22;    //  Казахский тенге
+        THB = 23;    //  Таиландский бат
+        NZD = 24;    //  Новозеландский доллар
+        NOK = 25;    //  Норвежская крона
+        CZK = 26;    //  Чешская крона
+        CNH = 27;    //  Китайский внутренний юань
+        MBC = 28;    //  MilliBitcoins
+        Unknown = 255;
+    }
+
+    enum PriceType {              // Допустимая цена
+        Positive         = 0;     // Положительная
+        NonNegative      = 1;     // Неотрицательная
+        Any              = 2;     // Любая
+        UnknownPriceType = 255;
+    }
+
+    MarketsMask     market          = 1;
+    string          isin            = 2;    // Для рынка XETRA совпадает с RIC, Для рынка US совпадает с Ticker
+    Type            type            = 3;
+    string          code            = 4;
+    string          short_name      = 5;
+    string          ext_isin        = 6;    // Для рынка XETRA обязателен, для других рынков м.б. пустым
+
+    int32           properties_mask = 7;    // 0x01 – Инструмент торгуется на Бирже
+                                            // 0x02 – Инструмент допущен к торгам у Брокера - существенно для НЕ ГЛАВНЫХ трейдеров, главным доступны все инструменты, торгуемые на биржах.
+                                            // 0x04 – Рыночные заявки (без ограничения по цене) разрешены
+                                            // 0x08 – Признак маржинальности бумаги
+                                            // 0x10 – опцион Call
+                                            // 0x20 – опцион Put (0x10 | 0x20 – фьючерс)
+                                            // 0x40 – разрешен для резидентов
+                                            // 0x80 – разрешен для нерезидентов
+
+    Currency        currency        = 8;    // Валюта инструмента
+    string          board           = 9;    // Основной режим торгов инструмента.
+    string          ric_complement  = 10;   // Довесок к m_pszISIN для получения RIC для инструментов NASDAQ
+    string          tzi_name        = 11;   // Имя таймзоны
+
+    // Для основного режима (board):
+    int64           lot_size        = 12;   // Для срочного рынка 1, для остальных - количество бумаг в лоте
+    int64           min_step        = 13;   // >= 0, если 0 - зависит от значения цены
+    double          bp_cost         = 14;   // Стоимость пункта цены одного инструмента (НЕ лота), без учета НКД
+    int32           decimals        = 15;   // Количество знаков в дробной части цены
+
+    double          accrued_int     = 16;   // Текущий НКД
+    double          price_cost      = 17;   // Преобразователь цены в стоимость
+
+    PriceType       price_type      = 18;   // Допустимая цена
+}
+
+message Venue {
+    string   literal = 1;
+    string   name    = 2;
+}

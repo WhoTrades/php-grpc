@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package finam.protobuf.common;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+
+option objc_class_prefix = "FNM";
+
+message Person {
+    string id                          = 1;
+    string name                        = 2;
+    string lastname                    = 3;
+    string email                       = 4;
+    google.protobuf.Timestamp birthday = 6;
+    Gender gender                      = 7;
+    string login                       = 8;
+    string verified_phone              = 10;
+    enum Gender {
+        UNDEFINED = 0;
+        FEMALE    = 1;
+        MALE      = 2;
+    }
+}
+
