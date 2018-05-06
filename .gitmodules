@@ -1,0 +1,18 @@
+[submodule "protos/finam/protobuf/txsecurities"]
+	path = protos/finam/protobuf/txsecurities
+	url = ssh://git@git.finam.ru:7999/ser/grpc-txsecurities.git
+[submodule "protos/finam/txsecurities"]
+	path = protos/finam/txsecurities
+	url = ssh://git@git.finam.ru:7999/ser/grpc-txsecurities.git
+[submodule "protos/finam/cgate"]
+	path = protos/finam/cgate
+	url = ssh://git@git.finam.ru:7999/dem/finam.cgate.client.git
+[submodule "protos/finam/proto"]
+	path = protos/finam/proto
+	url = ssh://git@git.finam.ru:7999/ser/grpc-proto.git
+[submodule "protos/finam/transaq"]
+	path = protos/finam/transaq
+	url = ssh://git@git.finam.ru:7999/ser/grpc-transaq.git
+[submodule "protos/finam/grpc-marketdata"]
+	path = protos/finam/grpc-marketdata
+	url = ssh://git@git.finam.ru:7999/ser/grpc-marketdata.git

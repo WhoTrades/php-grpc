@@ -7,7 +7,9 @@
   },
   "autoload": {
     "psr-4": {
-      "Finam\\": "Finam/",
+      "Finam\\": "auto/Finam/",
+      "Google\\": "auto/Google/",
+      "GPBMetadata\\": "auto/GPBMetadata/",
       "": "src/"
     }
   }
