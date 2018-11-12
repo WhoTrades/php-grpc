@@ -1,0 +1,96 @@
+﻿syntax = "proto3";
+
+package finam.protobuf.marketdata;
+
+import "google/rpc/status.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "finam/protobuf/marketdata/marketdata.proto";
+import "finam/protobuf/marketdata/quotes.proto";
+import "finam/protobuf/marketdata/trades.proto";
+import "finam/protobuf/marketdata/orderbook.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+enum Action {
+    Add    = 0;  // Добавить или изменить
+    Remove = 1;
+}
+
+message TaggedSecurity {
+    SecurityIdentifier id  = 1;
+    int64              tag = 2;
+}
+
+
+message SubscribeQuotesRequest {
+    Action                     action      = 1;
+    repeated TaggedSecurity    securities  = 2;
+    google.protobuf.FieldMask  field_mask  = 3;   // Поля сообщения Quote, которые будут заполняться источником данных
+}
+
+message SubscribeTradesRequest {
+    Action                    action     = 1;
+    repeated TaggedSecurity   securities = 2;
+    google.protobuf.Timestamp from       = 3;     // время, с которого запросить историю сделок (включительно)
+}
+
+message SubscribeOrderbooksRequest {
+    Action                  action     = 1;
+    repeated TaggedSecurity securities = 2;
+    int32                   depth      = 3;     // глубина стакана (в одну сторону)
+}
+
+
+message SubscribeQuotesResponse {
+    message Response {
+        google.rpc.Status  status      = 1;
+        TaggedSecurity     security    = 2;
+        Quote              quote       = 3;
+        bool               is_snapshot = 4;
+    }
+    repeated Response quotes        = 1;
+
+    // Нотификация теханализа о статусе источника данных.
+    // При подписке всегда будет установлено в первом сообщении.
+    google.rpc.Status source_status = 2;
+}
+
+message SubscribeTradesResponse {
+    message Response {
+        google.rpc.Status status      = 1;
+        TaggedSecurity    security    = 2;
+        Trade             trade       = 3;
+    }
+    repeated Response trades        = 1;
+
+    // см. SubscribeQuotesResponse
+    google.rpc.Status source_status = 2;
+}
+
+message SubscribeOrderbooksResponse {
+    message Response {
+        google.rpc.Status  status      = 1;
+        TaggedSecurity     security    = 2;
+        OrderBook          book        = 3;
+        bool               is_snapshot = 4;
+    }
+    repeated Response books         = 1;
+
+    // см. SubscribeQuotesResponse
+    google.rpc.Status source_status = 2;
+}
+
+
+service MDStream {
+    // Приходит снэпшот, затем апдейты (только поля, которые изменились и на которые есть подписка).
+    rpc SubscribeQuotes(stream SubscribeQuotesRequest) returns (stream SubscribeQuotesResponse) {}
+
+    // Приходят сделки целиком. Если будут запрошены сделки с параметром "from", но их нет в кэше - будет возвращена ошибка.
+    rpc SubscribeTrades(stream SubscribeTradesRequest) returns (stream SubscribeTradesResponse) {}
+
+    // Приходит снэпшот, затем апдейты.
+    rpc SubscribeOrderbooks(stream SubscribeOrderbooksRequest) returns (stream SubscribeOrderbooksResponse) {}
+}
+

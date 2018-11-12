@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package finam.protobuf.marketdata;
+
+import "finam/protobuf/common/types.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+message OrderBook {
+
+    message Row {
+        enum Action {
+            Unknown = 0;
+            AddOrUpdate = 1;
+            Remove = 2;
+        }
+        finam.protobuf.common.DecimalValue price    = 1;
+        oneof data_oneof {
+            finam.protobuf.common.DecimalValue sell = 2;
+            finam.protobuf.common.DecimalValue buy  = 3;
+        }
+        string mpid    = 4;  // for extended orderbook
+        Action action  = 5;
+    }
+
+    repeated Row rows  = 1;
+}
+

@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package finam.protobuf.marketdata;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/rpc/status.proto";
+
+import "finam/protobuf/marketdata/marketdata.proto";
+import "finam/protobuf/common/types.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+message Quote {
+    message TechState
+    {
+        State api_state     = 2;    // conection state with market API  online/close
+        State service_state = 3;   // connection state between services online/close
+
+        google.protobuf.Timestamp last_update_vendor_time = 30;
+        google.protobuf.Timestamp last_update_ta_time     = 31;
+    }
+
+    int64                              security_id         = 1;
+
+    finam.protobuf.common.DecimalValue last                = 10;   //  Include all regimes
+    google.protobuf.Int32Value         last_dir            = 11;
+    google.protobuf.DoubleValue        change              = 12;
+    google.protobuf.Int32Value         change_dir          = 13;
+    google.protobuf.Timestamp          last_time           = 14;
+    google.protobuf.Int64Value         last_trade_size     = 15;   //  inch of securities
+    google.protobuf.Int64Value         trade_count         = 16;
+
+    finam.protobuf.common.DecimalValue price               = 17;   //  Main session
+    google.protobuf.Int32Value         price_dir           = 18;   //  Main session
+    google.protobuf.Int64Value         price_trade_size    = 19;   //  inch of securities
+
+    google.protobuf.Int64Value         open_interes        = 20;
+
+    finam.protobuf.common.DecimalValue bid                 = 30;
+    google.protobuf.Int64Value         bidvol              = 31;   //  inch (see comment for last_trade_size)
+    google.protobuf.Timestamp          bid_time            = 32;
+    finam.protobuf.common.DecimalValue ask                 = 33;
+    google.protobuf.Int64Value         askvol              = 34;   //  inch (see comment for last_trade_size)
+    google.protobuf.Timestamp          ask_time            = 35;
+
+    finam.protobuf.common.DecimalValue open                = 40;
+    finam.protobuf.common.DecimalValue high                = 41;
+    finam.protobuf.common.DecimalValue low                 = 42;
+    google.protobuf.Int64Value         volume              = 44;   //  NOTE: inch	(see comment for last_trade_size)
+    finam.protobuf.common.DecimalValue value               = 45;   //  NOTE: not translated from RFA (money)
+
+
+    finam.protobuf.common.DecimalValue official_close      = 50;   //  today official close price
+
+    finam.protobuf.common.DecimalValue prev_close          = 51;   //  previous close on main session				-- to delete  --
+    finam.protobuf.common.DecimalValue prev_official_close = 52;   //  previous official close						-- to delete  --
+    finam.protobuf.common.DecimalValue prev_close_post     = 53;   //  previous close on post market === close		-- to delete  --
+    google.protobuf.Timestamp          prev_close_date     = 54;   //  closedate===HSTCLSEDATE						-- to delete  --
+
+    finam.protobuf.common.DecimalValue yhigh               = 60;   //  calendar52WeekHigh
+    finam.protobuf.common.DecimalValue ylow                = 61;   //  calendar52WeekLow
+    finam.protobuf.common.DecimalValue w52high             = 62;   //  rolling52WeekHigh							-- to delete  --
+    finam.protobuf.common.DecimalValue w52low              = 63;   //  rolling52WeekLow								-- to delete  --
+
+    State                              state               = 70;   //  status of quote
+
+    TechState                          tech_state          = 80;
+
+    finam.protobuf.common.DecimalValue change_v2           = 81;   //  временное решение для перехода с DoubleValue на DecimalValue
+
+	finam.protobuf.common.DecimalValue day_range		   = 82;   //  high - low
+	finam.protobuf.common.DecimalValue day_range_ticks	   = 83;   //  high - low in ticks (tick size)
+
+
+	message Prev {
+		finam.protobuf.common.DecimalValue	close			= 1;   //  previous close on main session
+		finam.protobuf.common.DecimalValue	official_close	= 2;   //  previous official close
+		finam.protobuf.common.DecimalValue	close_post		= 3;   //  previous close on post market === close
+		google.protobuf.Timestamp			close_date		= 4;   //  closedate===HSTCLSEDATE
+	}
+	Prev prev = 84;
+
+	message W52 {
+		finam.protobuf.common.DecimalValue high				= 1;	//  rolling52WeekHigh
+		finam.protobuf.common.DecimalValue low				= 2;	//  rolling52WeekLow
+		finam.protobuf.common.DecimalValue ma				= 3;    //  moving average close for last 52 weeks
+		finam.protobuf.common.DecimalValue ma_volume		= 4;	//  moving average volume for last 52 weeks
+	}
+	W52	w52 = 85;
+
+	message D200 {
+		finam.protobuf.common.DecimalValue high				= 1;	//  rolling200DayHigh
+		finam.protobuf.common.DecimalValue low				= 2;	//  rolling200DayLow
+		finam.protobuf.common.DecimalValue ma				= 3;    //  moving average close for last 200 days
+		finam.protobuf.common.DecimalValue ma_volume		= 4;	//  moving average volume for last 200 days
+	}
+	D200 d200 = 86;
+
+    google.protobuf.Timestamp vendor_activity_time = 87;
+    google.protobuf.Timestamp feed_time = 88;  // время, когда источник данных получил данную котировку
+
+
+// Дополнительная информация
+    message Additions {
+        // Дополнительная информация для инструмента 'фьючерс'
+        message Fut {
+            finam.protobuf.common.DecimalValue buy_deposit = 1;  // ГО покупателя
+            finam.protobuf.common.DecimalValue sell_deposit = 2; // ГО продавца
+        }
+
+        oneof additions_oneof {
+            Fut fut = 1;
+        }
+    }
+
+    // Дополнительные данные, специфичные для разных инструментов
+    Additions additions = 1024;
+}
+
+message QuoteRequest {
+    // Идентификатор инструмента.
+     int64 security_id = 1;
+
+    // Список номеров запрашиваемых полей структуры Quote,
+    // если не задано возвращаются все поля,
+    // если задано, то поле security_id (1) добавляется в ответ автоматически.
+    repeated int64 fields = 2;
+}
+
+message QuoteResponse {
+    google.rpc.Status status = 1;
+    Quote quote = 2;
+}
+
+// Запрос котировок по нескольким инструментам
+message QuotesRequest {
+    // Идентификаторы инструментов.
+    repeated SecurityIdentifier identifiers = 1;
+
+    // Список номеров запрашиваемых полей структуры Quote,
+    // если не задано возвращаются все поля,
+    // если задано, то поле security_id (1) добавляется в ответ автоматически.
+    repeated int64 fields = 2;
+}
+
+message QuotesResponse {
+    // Ответ по каждому из запрошенных инструментов,
+    // поле 'identifier' в ответе дублирует поле в запросе.
+    // Порядок котировок в ответе ДОЛЖЕН соответсвовать порядку идентификаторов в запросе.
+    message Response {
+        google.rpc.Status status = 1;
+        SecurityIdentifier identifier = 2;
+        Quote quote = 3;
+    }
+
+    repeated Response response = 1;
+}
+
+
+service Quotes {
+    // Подписаться на получение котировок по одному инструменту.
+    rpc SubscribeQuotes(QuoteRequest) returns (stream QuoteResponse) {}
+    // Получить текущую котировку по одному инструменту.
+    rpc GetQuote(QuoteRequest) returns (QuoteResponse) {}
+    // Получить текущие котировки по нескольким инструментам.
+    rpc GetQuotes(QuotesRequest) returns (QuotesResponse) {}
+}

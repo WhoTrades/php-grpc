@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package finam.protobuf.marketdata;
+
+import "finam/protobuf/common/types.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+import "finam/protobuf/marketdata/marketdata.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+// TODO: Перед тем как начать использовать типы
+// DecimalValue и/или Int64Value
+// необходимо проверить на сколько это увеличит поток передаваеммых данных.
+message Trade {
+    enum Direction {
+        UNKNOWN = 0;
+        BUY = 1;
+        SELL = 2;
+    }
+
+    enum Type {
+        MAINSESSION = 0;
+    }
+
+    // Номер сделки (уникален в рамках биржевого дня и биржи).
+    int64 tradeno = 1;
+    // Идентификатор биржи
+    int64 exchange_id = 2;
+    // UTC дата и время сделки.
+    google.protobuf.Timestamp date = 3;
+
+    finam.protobuf.common.DecimalValue price = 4;
+
+    // inch of securities
+    int32 qty = 5;
+
+    // Тип сделки (buy or sell).
+    Direction direction  = 6;
+
+    Type type = 7;
+
+    int64 open_interes = 8;
+
+    google.protobuf.Timestamp feed_time = 9;  // время, когда источник данных получил данную сделку
+}
+
+message TradesRequest {
+    // Идентификатор инструмента.
+    int64 security_id = 1;
+
+    // ВременнЫе или количественные параметры запрашиваемых данных.
+    Bound bound = 2;
+}
+
+message TradesResponse {
+    google.rpc.Status status = 1;
+    repeated Trade trades = 2;
+}
+
+message AvailableTradesInfoRequest {
+    int64 security_id = 1;
+}
+
+service Trades {
+    rpc SubscribeTrades(TradesRequest) returns (stream TradesResponse) {}
+    rpc GetTrades(TradesRequest) returns (TradesResponse) {}
+    rpc GetAvailableTradesInfo(AvailableTradesInfoRequest) returns (AvailableDataInfoResponse) {}
+}

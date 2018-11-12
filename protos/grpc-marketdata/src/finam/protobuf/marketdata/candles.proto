@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package finam.protobuf.marketdata;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/rpc/status.proto";
+
+import "finam/protobuf/marketdata/marketdata.proto";
+import "finam/protobuf/common/types.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+message TimeFrame {
+    enum Unit {
+        UNDEFINED = 0;
+        MINUTE = 1;
+        HOUR = 2;
+        DAY = 3;
+        WEEK = 4;
+        MONTH = 5;
+        QUARTER = 6;
+        YEAR = 7;
+    }
+
+    // Единица измерения временнОго интервала.
+    Unit time_unit = 1;
+
+    // Размер временнОго интервала в заданных единицах.
+    int32 count = 2;
+}
+
+message Candle {
+    // UTC дата и время начала биржевой свечи.
+    google.protobuf.Timestamp date = 1;
+
+    finam.protobuf.common.DecimalValue open = 2;
+    finam.protobuf.common.DecimalValue high = 3;
+    finam.protobuf.common.DecimalValue low = 4;
+    finam.protobuf.common.DecimalValue close = 5;
+    //  rt.qty()*rt.price()*parent_issue->lotsize()
+    finam.protobuf.common.DecimalValue value = 6;
+    //  inch of secutiries
+    google.protobuf.Int64Value volume = 7;
+
+    // Идентификатор последней сделки учтеной при расчете биржевой свечи.
+    google.protobuf.Int64Value last_trade_id = 8;
+}
+
+// Подписка на биржевые свечи по заданному инструменту и временнОму интервалу
+message CandlesSubscribe {
+    // Идентификатор инструмента.
+    int64 security_id = 1;
+
+    // ВременнОй интервал биржевой свечи.
+    TimeFrame time_frame = 2;
+
+    // ВременнЫе или количественные параметры запрашиваемых данных.
+    Bound bound = 3;
+}
+
+// Запрос биржевых свечей по заданному инструменту и временнОму интервалу
+message CandlesRequest {
+    // Идентификатор инструмента.
+    SecurityIdentifier identifier = 1;
+
+    // ВременнОй интервал биржевой свечи.
+    TimeFrame time_frame = 2;
+
+    // ВременнЫе или количественные параметры запрашиваемых данных.
+    Bound bound = 3;
+}
+
+message CandlesResponse {
+    google.rpc.Status status = 1;
+    repeated Candle candles = 2;
+}
+
+message AvailableCandlesInfoRequest {
+    // Идентификатор инструмента по которуму осуществляется запрос данных.
+    int64 security_id = 1;
+    // ВременнОй период биржевой свечи.
+    TimeFrame time_frame = 2;
+}
+
+service Candles {
+    // Подписка на получение биржевых свечей по заданному инструменту
+    // Если не задано значение bound, то происходит подписка на получение биржевых свечей начиная с текущего времени и до окончания подписки.
+    // Если задано значение bound.end, то сначала будут получены данные за определенный временнОй период, а затем происходит подписка на получение данные с указанного времени.
+    rpc SubscribeCandles(CandlesSubscribe) returns (stream CandlesResponse) {}
+
+    // Получение биржевых свечей по заданному инструменту.
+    rpc GetCandles(CandlesRequest) returns (CandlesResponse) {}
+
+    // Получить временнОй период за который доступны биржевые свечи по указанному инструменту.
+    rpc GetAvailableCandlesInfo(AvailableCandlesInfoRequest) returns (AvailableDataInfoResponse) {}
+}

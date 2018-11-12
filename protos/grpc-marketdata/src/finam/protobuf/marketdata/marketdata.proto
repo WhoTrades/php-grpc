@@ -1,0 +1,197 @@
+syntax = "proto3";
+
+package finam.protobuf.marketdata;
+
+import "finam/protobuf/common/types.proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+enum State
+{
+    STATE_UNKNOWN = 0;
+    //  is actual
+    STATE_ONLINE = 1;
+
+    //  is out of shedule or off
+    STATE_CLOSE = 2;
+    STATE_PREMARKET = 3;
+    STATE_AUCTION = 4;
+    STATE_POSTMARKET= 5;
+
+    //  trade is stoped
+    STATE_PAUSE = 6;
+}
+
+// Универсальный идентификатор инструмента,
+// позволяющий однозначно идентифицировать инструмент одним из следующих способов:
+// - по уникальному целочисленному идентификатору;
+// - по тикеру и MIC'у;
+// - по Seccode и Secboard;
+// - по ISIN'у и MIC'у.
+message SecurityIdentifier {
+    message TickerAndMic {
+        string ticker = 1;
+        string mic = 2;
+    }
+    message SeccodeAndSecboard {
+        string seccode= 1;
+        string secboard = 2;
+    }
+    message IsinAndMic {
+        string isin = 1;
+        string mic = 2;
+    }
+    message Consolidated {
+        enum Kind {
+            UNKNOWN = 0;
+            US_MARKET = 1; // Консолидированный инструмент на американском рынке
+        }
+
+        Kind kind = 1;
+        oneof id_oneof {
+            string ticker = 2;
+            string isin = 3;
+        }
+    }
+
+    oneof data_oneof {
+        int64               security_id      = 1;
+        TickerAndMic        ticker_mic       = 2;
+        SeccodeAndSecboard  seccode_secboard = 3;
+        IsinAndMic          isin_mic         = 4;
+        Consolidated        consolidated     = 5;
+    }
+}
+
+message AvailableDataInfoResponse {
+    google.protobuf.Timestamp start = 1;
+    google.protobuf.Timestamp end = 2;
+    int64 count = 3;
+}
+
+// Bound задает временнОй или количественный интервал для запрашиваемых данных [start, end].
+// Точки начала и окончания входят в интервал.
+message Bound {
+    // ВременнАя точку начала отсчета для получаемых данных.
+    // Если значение не задано (== 0), то за время начало отсчета принимается текущие время (время начала обработки запроса сервисом).
+    google.protobuf.Timestamp start = 1;
+
+    // Определеят способ вычисления конечной точки временнОго интеравала и может принимать одно из заданных значений.
+    oneof end {
+        // Определяет обсолютное значение окончания временнОго интервала. Может быть меньше точки начала отсчета.
+        google.protobuf.Timestamp to = 2;
+
+        // Определяет продолжительность временнОго интервала. Может принимать как положительные так и отрицательные значения.
+        google.protobuf.Duration duration = 3;
+
+        // Определяет количество возвращаемых данных (в штуках). Может принимать как положительное так и отрицательное значение.
+        // Если значение положительное, то будут возвращены данные начиная от времени начала отсчета, в количестве не превыщающим заданное значение.
+        // Если значение отрицательное, то будут возвращены данные предществующие данным на начало отсчета (включая время начало отсчета), в количестве не превыщающим модуль заданного значения.
+        int32 count = 4;
+    }
+}
+
+// Общие поля инстурментов, [Data] from [TA].[Markets].[Securities], https://wiki.finam.ru/x/TYDQBQ
+message Common {
+	string								security_name			= 1;
+	string								tax_identifier			= 2;
+	int32								sec_type				= 3;
+	int32								sec_type2				= 4;
+	int64								blindustry				= 5;
+	int64								gisc					= 6;
+	int32								market_sector			= 7;
+	string								company_name			= 8;
+	string								bloomberg_exch_code		= 9;
+	string								currency				= 10;
+	map<int32, string>					common_names			= 11;	// имена на разных языках, ключ из enum finam.protobuf.common.Lang
+}
+
+// Набор полей для акций, [Data] from [TA].[Markets].[Securities], https://wiki.finam.ru/x/TYDQBQ
+message Equity {
+	finam.protobuf.common.DecimalValue  face_value				= 1;
+	string								face_unit				= 2;
+	int32								decimals				= 3;
+	finam.protobuf.common.DecimalValue	lot_size				= 4;
+	finam.protobuf.common.DecimalValue	tick_size				= 5;
+	string								currency				= 6;
+	string								reg_num					= 7;
+}
+
+// Набор полей для опционов, [Data] from [TA].[Markets].[Securities], https://wiki.finam.ru/x/TYDQBQ
+message Option {
+	enum Type {
+		CALL = 0;
+		PUT = 1;
+	}
+	enum Style {
+		EUROPEAN = 0;
+		AMERICAN = 1;
+	}
+
+	Type								type					= 1;
+	Style								style					= 2;
+	finam.protobuf.common.DecimalValue	lot_size				= 3;
+	finam.protobuf.common.DecimalValue	contract_size			= 4;
+	finam.protobuf.common.DecimalValue	tick_value				= 5;
+	finam.protobuf.common.DecimalValue	tick_size				= 6;
+	google.protobuf.Timestamp			trade_first_day			= 7;
+	google.protobuf.Timestamp			trade_last_day			= 8;
+	google.protobuf.Timestamp			expiration_first_day	= 9;
+	google.protobuf.Timestamp			expiration_last_day		= 10;
+	finam.protobuf.common.DecimalValue	strike					= 11;
+	int32								decimal_places			= 12;
+	string								root					= 13;
+}
+
+// Набор полей для фьючерсов, [Data] from [TA].[Markets].[Securities], https://wiki.finam.ru/x/TYDQBQ
+message Future {
+	string								exch_symbol				= 1;
+	string								exch_symbol_full		= 2;
+	google.protobuf.Timestamp			delivery_last_day		= 3;
+	google.protobuf.Timestamp			trade_last_day			= 4;
+	finam.protobuf.common.DecimalValue	lot_size				= 5;
+	finam.protobuf.common.DecimalValue	contract_size			= 6;
+	finam.protobuf.common.DecimalValue	tick_value				= 7;
+	finam.protobuf.common.DecimalValue	tick_size				= 8;
+	google.protobuf.Timestamp			trade_first_day			= 9;
+	google.protobuf.Timestamp			notice_first_day		= 10;
+	int32								decimal_places			= 11;
+	int32								is_trade_percent		= 12;
+}
+
+// Набор полей для бондов/облигаций, [Data] from [TA].[Markets].[Securities], https://wiki.finam.ru/x/TYDQBQ
+message Debt {
+	finam.protobuf.common.DecimalValue  face_value				= 1;
+	string								face_unit				= 2;
+	google.protobuf.Timestamp			issue_date				= 3;
+	google.protobuf.Timestamp			maturity				= 4;
+	finam.protobuf.common.DecimalValue	coupon					= 5;
+	int32								coupon_period			= 6;
+	int32								decimals				= 7;
+	int64								issue_size				= 8;
+	finam.protobuf.common.DecimalValue	lot_size				= 9;
+	finam.protobuf.common.DecimalValue	tick_size				= 10;
+	string								currency				= 11;
+	string								reg_num					= 12;
+	int32								fund_type				= 13;
+}
+
+// Набор полей для спредов, [Data] from [TA].[Markets].[Securities], https://wiki.finam.ru/x/TYDQBQ
+message Spread {
+	string								exch_symbol				= 1;
+	string								exch_symbol_full		= 2;
+	google.protobuf.Timestamp			delivery_last_day		= 3;
+	google.protobuf.Timestamp			trade_last_day			= 4;
+	finam.protobuf.common.DecimalValue	lot_size				= 5;
+	finam.protobuf.common.DecimalValue	contract_size			= 6;
+	finam.protobuf.common.DecimalValue	tick_value				= 7;
+	finam.protobuf.common.DecimalValue	tick_size				= 8;
+	google.protobuf.Timestamp			trade_first_day			= 9;
+	google.protobuf.Timestamp			notice_first_day		= 10;
+	int32								decimal_places			= 11;
+	int32								is_trade_percent		= 12;
+}
