@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package grpc.marketdata;
+
+import "google/rpc/status.proto";
+
+import "proto/marketdata/marketdata.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+
+message TradesRequest {
+    // Идентификатор инструмента.
+    int64 security_id = 1;
+
+    // ВременнЫе или количественные параметры запрашиваемых данных.
+    proto.marketdata.Bound bound = 2;
+}
+
+message TradesResponse {
+    google.rpc.Status status = 1;
+    repeated proto.marketdata.Trade trades = 2;
+}
+
+message AvailableTradesInfoRequest {
+    int64 security_id = 1;
+}
+
+service Trades {
+    rpc SubscribeTrades(TradesRequest) returns (stream TradesResponse) {}
+    rpc GetTrades(TradesRequest) returns (TradesResponse) {}
+    rpc GetAvailableTradesInfo(AvailableTradesInfoRequest) returns (proto.marketdata.AvailableDataInfoResponse) {}
+}

@@ -1,13 +1,14 @@
 syntax = "proto3";
 
-package finam.protobuf.marketdata;
+package grpc.marketdata;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/rpc/status.proto";
 
-import "finam/protobuf/marketdata/marketdata.proto";
-import "finam/protobuf/common/types.proto";
+import "proto/common/securityidentifier.proto";
+import "proto/marketdata/marketdata.proto";
+import "proto/common/types.proto";
 
 option java_multiple_files = true;
 option objc_class_prefix = "FNM";
@@ -35,12 +36,12 @@ message Candle {
     // UTC дата и время начала биржевой свечи.
     google.protobuf.Timestamp date = 1;
 
-    finam.protobuf.common.DecimalValue open = 2;
-    finam.protobuf.common.DecimalValue high = 3;
-    finam.protobuf.common.DecimalValue low = 4;
-    finam.protobuf.common.DecimalValue close = 5;
+    proto.common.DecimalValue open = 2;
+    proto.common.DecimalValue high = 3;
+    proto.common.DecimalValue low = 4;
+    proto.common.DecimalValue close = 5;
     //  rt.qty()*rt.price()*parent_issue->lotsize()
-    finam.protobuf.common.DecimalValue value = 6;
+    proto.common.DecimalValue value = 6;
     //  inch of secutiries
     google.protobuf.Int64Value volume = 7;
 
@@ -57,19 +58,19 @@ message CandlesSubscribe {
     TimeFrame time_frame = 2;
 
     // ВременнЫе или количественные параметры запрашиваемых данных.
-    Bound bound = 3;
+    proto.marketdata.Bound bound = 3;
 }
 
 // Запрос биржевых свечей по заданному инструменту и временнОму интервалу
 message CandlesRequest {
     // Идентификатор инструмента.
-    SecurityIdentifier identifier = 1;
+    proto.common.SecurityIdentifier identifier = 1;
 
     // ВременнОй интервал биржевой свечи.
     TimeFrame time_frame = 2;
 
     // ВременнЫе или количественные параметры запрашиваемых данных.
-    Bound bound = 3;
+    proto.marketdata.Bound bound = 3;
 }
 
 message CandlesResponse {
@@ -94,5 +95,5 @@ service Candles {
     rpc GetCandles(CandlesRequest) returns (CandlesResponse) {}
 
     // Получить временнОй период за который доступны биржевые свечи по указанному инструменту.
-    rpc GetAvailableCandlesInfo(AvailableCandlesInfoRequest) returns (AvailableDataInfoResponse) {}
+    rpc GetAvailableCandlesInfo(AvailableCandlesInfoRequest) returns (proto.marketdata.AvailableDataInfoResponse) {}
 }

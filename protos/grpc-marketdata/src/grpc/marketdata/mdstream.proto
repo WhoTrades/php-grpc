@@ -1,14 +1,12 @@
 ﻿syntax = "proto3";
 
-package finam.protobuf.marketdata;
+package grpc.marketdata;
 
 import "google/rpc/status.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/field_mask.proto";
-import "finam/protobuf/marketdata/marketdata.proto";
-import "finam/protobuf/marketdata/quotes.proto";
-import "finam/protobuf/marketdata/trades.proto";
-import "finam/protobuf/marketdata/orderbook.proto";
+import "proto/marketdata/marketdata.proto";
+import "grpc/marketdata/tagged_security.proto";
 
 option java_multiple_files = true;
 option objc_class_prefix = "FNM";
@@ -17,12 +15,6 @@ enum Action {
     Add    = 0;  // Добавить или изменить
     Remove = 1;
 }
-
-message TaggedSecurity {
-    SecurityIdentifier id  = 1;
-    int64              tag = 2;
-}
-
 
 message SubscribeQuotesRequest {
     Action                     action      = 1;
@@ -45,10 +37,10 @@ message SubscribeOrderbooksRequest {
 
 message SubscribeQuotesResponse {
     message Response {
-        google.rpc.Status  status      = 1;
-        TaggedSecurity     security    = 2;
-        Quote              quote       = 3;
-        bool               is_snapshot = 4;
+        google.rpc.Status       status      = 1;
+        TaggedSecurity          security    = 2;
+        proto.marketdata.Quote   quote      = 3;
+        bool                    is_snapshot = 4;
     }
     repeated Response quotes        = 1;
 
@@ -61,7 +53,7 @@ message SubscribeTradesResponse {
     message Response {
         google.rpc.Status status      = 1;
         TaggedSecurity    security    = 2;
-        Trade             trade       = 3;
+        proto.marketdata.Trade trade  = 3;
     }
     repeated Response trades        = 1;
 
@@ -71,10 +63,10 @@ message SubscribeTradesResponse {
 
 message SubscribeOrderbooksResponse {
     message Response {
-        google.rpc.Status  status      = 1;
-        TaggedSecurity     security    = 2;
-        OrderBook          book        = 3;
-        bool               is_snapshot = 4;
+        google.rpc.Status  status       = 1;
+        TaggedSecurity     security     = 2;
+        proto.marketdata.OrderBook book = 3;
+        bool               is_snapshot  = 4;
     }
     repeated Response books         = 1;
 
@@ -93,4 +85,3 @@ service MDStream {
     // Приходит снэпшот, затем апдейты.
     rpc SubscribeOrderbooks(stream SubscribeOrderbooksRequest) returns (stream SubscribeOrderbooksResponse) {}
 }
-

@@ -10,14 +10,12 @@ find protos -name '*.proto' -exec sed -i 's/(google.protobuf.Empty)/(google.prot
 
 find protos -name '*.proto' -exec sed -i 's/\.protos/\.proto/g' {} \;
 
-protoc --proto_path=protos/finam/txsecurities/src/ \
-       --proto_path=protos/finam/transaq/src/ \
-       --proto_path=protos/finam/cgate/src/ \
-       --proto_path=protos/finam/proto/src/ \
-       --proto_path=vendor/google/protobuf/src/ \
+protoc --proto_path=protos/grpc-proto/src/ \
        --proto_path=protos/grpc-marketdata/src/ \
-       --php_out=auto \
-       --grpc_out=auto \
+       --proto_path=protos/grpc-txsecurities/src/ \
+       --proto_path=vendor/google/protobuf/src/ \
+       --php_out=generated \
+       --grpc_out=generated \
        --plugin=protoc-gen-grpc=/home/vagrant/grpc/bins/opt/grpc_php_plugin \
 	$@
 

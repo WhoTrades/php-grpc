@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package grpc.marketdata;
+
+import "google/rpc/status.proto";
+
+import "proto/marketdata/marketdata.proto";
+import "proto/common/securityidentifier.proto";
+
+option java_multiple_files = true;
+option objc_class_prefix = "FNM";
+
+
+message LegacyQuoteRequest {
+    // Идентификатор инструмента.
+     int64 security_id = 1;
+
+    // Список номеров запрашиваемых полей структуры Quote,
+    // если не задано возвращаются все поля,
+    // если задано, то поле security_id (1) добавляется в ответ автоматически.
+    repeated int64 fields = 2;
+}
+
+message LegacyQuoteResponse {
+    google.rpc.Status status = 1;
+    proto.marketdata.Quote quote = 2;
+}
+
+// Запрос котировок по нескольким инструментам
+message LegacyQuotesRequest {
+    // Идентификаторы инструментов.
+    repeated proto.common.SecurityIdentifier identifiers = 1;
+
+    // Список номеров запрашиваемых полей структуры Quote,
+    // если не задано возвращаются все поля,
+    // если задано, то поле security_id (1) добавляется в ответ автоматически.
+    repeated int64 fields = 2;
+}
+
+message LegacyQuotesResponse {
+    // Ответ по каждому из запрошенных инструментов,
+    // поле 'identifier' в ответе дублирует поле в запросе.
+    // Порядок котировок в ответе ДОЛЖЕН соответсвовать порядку идентификаторов в запросе.
+    message Response {
+        google.rpc.Status status = 1;
+        proto.common.SecurityIdentifier identifier = 2;
+        proto.marketdata.Quote quote = 3;
+    }
+
+    repeated Response response = 1;
+}
+
+
+service Quotes {
+    // Подписаться на получение котировок по одному инструменту.
+    rpc SubscribeQuotes(LegacyQuoteRequest) returns (stream LegacyQuoteResponse) {}
+    // Получить текущую котировку по одному инструменту.
+    rpc GetQuote(LegacyQuoteRequest) returns (LegacyQuoteResponse) {}
+    // Получить текущие котировки по нескольким инструментам.
+    rpc GetQuotes(LegacyQuotesRequest) returns (LegacyQuotesResponse) {}
+}

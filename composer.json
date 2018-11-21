@@ -1,16 +1,22 @@
 {
-  "name": "whotrades/grpc-demo",
-  "description": "gRPC example for PHP",
+  "name": "whotrades/php-grpc",
+  "description": "PHP gRPC",
   "require": {
     "grpc/grpc": "^v1.3.0",
     "google/protobuf": "^v3.3.0"
   },
   "autoload": {
     "psr-4": {
-      "Finam\\": "auto/Finam/",
-      "Google\\": "auto/Google/",
-      "GPBMetadata\\": "auto/GPBMetadata/",
+      "PhpGrpc\\": "auto/",
       "": "src/"
     }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "git submodule init && git submodule update && find protos/ -name '*.proto'|xargs -I {} bash gen.sh {}"
+    ],
+    "post-update-cmd": [
+      "git submodule init && git submodule update && find protos/ -name '*.proto'|xargs -I {} bash gen.sh {}"
+    ]
   }
 }

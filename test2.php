@@ -1,13 +1,13 @@
 <?php
-use Finam\Protobuf\Marketdata\SecurityIdentifier;
-use Finam\Protobuf\Marketdata\SubscribeQuotesRequest;
-use Finam\Protobuf\Marketdata\SubscribeQuotesResponse;
-use Finam\Protobuf\Marketdata\SubscribeQuotesResponse_Response;
-use Finam\Protobuf\Marketdata\TaggedSecurity;
+use \PhpGrpc\Proto\Common\SecurityIdentifier;
+use \PhpGrpc\Grpc\Marketdata\SubscribeQuotesRequest;
+use \PhpGrpc\Grpc\Marketdata\SubscribeQuotesResponse;
+use \PhpGrpc\Grpc\Marketdata\SubscribeQuotesResponse_Response;
+use \PhpGrpc\Grpc\Marketdata\TaggedSecurity;
 
 require_once('vendor/autoload.php');
 
-$client = new \Finam\Protobuf\Marketdata\MDStreamClient('192.168.0.10:35558', [
+$client = new \PhpGrpc\Grpc\Marketdata\MDStreamClient('msa-ftcd1-tst02:5666', [
     'Authorization' => 'fb17882585bbfe9c55733a6e46a265ddaea6957a',
     'credentials' => null,
 ]);
@@ -31,7 +31,7 @@ foreach ($result->getQuotes()->getIterator() as $val) {
     }
 }
 
-function getValue(\Finam\Protobuf\Common\DecimalValue $val)
+function getValue(\PhpGrpc\Proto\Common\DecimalValue $val)
 {
     return $val->getNum() + $val->getFrac() * pow(10, -$val->getScale());
 }
