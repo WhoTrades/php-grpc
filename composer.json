@@ -14,13 +14,11 @@
   "scripts": {
     "post-install-cmd": [
       "git submodule init && git submodule update",
-      "find protos/ -name '*.proto'|xargs -I {} bash gen.sh {}",
-      "bash gen.sh vendor/google/protobuf/src/google/protobuf/empty.proto"
+      "bash generate.sh"
     ],
     "post-update-cmd": [
       "git submodule init && git submodule update",
-      "find protos/ -name '*.proto'|xargs -I {} bash gen.sh {}",
-      "bash gen.sh vendor/google/protobuf/src/google/protobuf/empty.proto"
+      "bash generate.sh"
     ]
   }
 }
