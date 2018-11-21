@@ -13,6 +13,7 @@ find protos -name '*.proto' -exec sed -i 's/\.protos/\.proto/g' {} \;
 protoc --proto_path=protos/grpc-proto/src/ \
        --proto_path=protos/grpc-marketdata/src/ \
        --proto_path=protos/grpc-txsecurities/src/ \
+       --proto_path=protos/grpc-transaq/src/ \
        --proto_path=vendor/google/protobuf/src/ \
        --php_out=generated \
        --grpc_out=generated \
