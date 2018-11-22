@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a39b8003abdff27100d6d27291e45785",
+    "content-hash": "2c2b3c113c49d239a205555a80d7d232",
     "packages": [
         {
             "name": "google/protobuf",
-            "version": "v3.5.2",
+            "version": "v3.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/protobuf.git",
-                "reference": "b5fbb742af122b565925987e65c08957739976a7"
+                "reference": "48cb18e5c419ddd23d9badcfe4e9df7bde1979b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/protobuf/zipball/b5fbb742af122b565925987e65c08957739976a7",
-                "reference": "b5fbb742af122b565925987e65c08957739976a7",
+                "url": "https://api.github.com/repos/google/protobuf/zipball/48cb18e5c419ddd23d9badcfe4e9df7bde1979b2",
+                "reference": "48cb18e5c419ddd23d9badcfe4e9df7bde1979b2",
                 "shasum": ""
             },
             "require": {
@@ -45,27 +45,27 @@
             "keywords": [
                 "proto"
             ],
-            "time": "2018-03-06T03:54:18+00:00"
+            "time": "2018-07-27T20:30:28+00:00"
         },
         {
             "name": "grpc/grpc",
-            "version": "1.10.0",
+            "version": "1.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/grpc/grpc-php.git",
-                "reference": "741f59bac86c7b5e45818c8f2eec6980921bce23"
+                "reference": "1a7cd0dc95a68594b8a8cfbf75ff236383172e2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/grpc/grpc-php/zipball/741f59bac86c7b5e45818c8f2eec6980921bce23",
-                "reference": "741f59bac86c7b5e45818c8f2eec6980921bce23",
+                "url": "https://api.github.com/repos/grpc/grpc-php/zipball/1a7cd0dc95a68594b8a8cfbf75ff236383172e2f",
+                "reference": "1a7cd0dc95a68594b8a8cfbf75ff236383172e2f",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5.0"
             },
             "require-dev": {
-                "google/auth": "v0.9"
+                "google/auth": "^v1.3.0"
             },
             "suggest": {
                 "ext-protobuf": "For better performance, install the protobuf C extension.",
@@ -86,7 +86,7 @@
             "keywords": [
                 "rpc"
             ],
-            "time": "2018-03-28T22:54:08+00:00"
+            "time": "2018-09-12T21:49:56+00:00"
         }
     ],
     "packages-dev": [],

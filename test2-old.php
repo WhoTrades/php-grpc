@@ -1,13 +1,13 @@
 <?php
-use \PhpGrpc\Proto\Common\SecurityIdentifier;
-use \PhpGrpc\Grpc\Marketdata\SubscribeQuotesRequest;
-use \PhpGrpc\Grpc\Marketdata\SubscribeQuotesResponse;
-use \PhpGrpc\Grpc\Marketdata\SubscribeQuotesResponse_Response;
-use \PhpGrpc\Grpc\Marketdata\TaggedSecurity;
+use \Proto\Common\SecurityIdentifier;
+use \Grpc\Marketdata\SubscribeQuotesRequest;
+use \Grpc\Marketdata\SubscribeQuotesResponse;
+use \Grpc\Marketdata\SubscribeQuotesResponse_Response;
+use \Grpc\Marketdata\TaggedSecurity;
 
 require_once('vendor/autoload.php');
 
-$client = new \PhpGrpc\Grpc\Marketdata\MDStreamClient('msa-ftcd1-tst02:5666', [
+$client = new \Grpc\Marketdata\MDStreamClient('msa-ftcd1-tst02:5666', [
     'Authorization' => 'fb17882585bbfe9c55733a6e46a265ddaea6957a',
     'credentials' => null,
 ]);

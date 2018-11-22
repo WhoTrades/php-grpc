@@ -2,13 +2,13 @@
   "name": "whotrades/php-grpc",
   "description": "PHP gRPC",
   "require": {
-    "grpc/grpc": "^v1.3.0",
+    "grpc/grpc": "^v1.15.0",
     "google/protobuf": "^v3.3.0"
   },
   "autoload": {
     "psr-4": {
-      "PhpGrpc\\": "auto/",
-      "": "src/"
+      "": "generated/",
+      "PhpGrpc\\": "src/"
     }
   },
   "scripts": {

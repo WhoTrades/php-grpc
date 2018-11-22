@@ -1,25 +1,14 @@
 <?php
 
-use Finam\Protobuf\Txsecurities\SecuritiesSearchRequest;
-use Finam\Protobuf\Txsecurities\TXSecuritiesClientClient;
-use Grpc\ChannelCredentials;
-
 require_once('vendor/autoload.php');
 
-$creds = ChannelCredentials::createInsecure();
-$creds = null;
+$mdStreamHost = 'msa-ftcd1-tst02:5666';
 
-$a = new TXSecuritiesClientClient('192.168.0.10:35558', [
-    'Authorization' => 'fb17882585bbfe9c55733a6e46a265ddaea6957a',
-    'credentials' => $creds,
-]);
+//$txSecuritiesHost = '10.200.128.148:35554';
+$txSecuritiesHost = '10.200.160.149:35554';
 
-$message = new SecuritiesSearchRequest();
-$message->setLimit(10);
-$message->setQuery('EURUSD');
+//$test = new \PhpGrpc\Test($mdStreamHost);
+//$test->test();
 
-echo json_encode($a->Search($message, [], ['credentials' => $creds])->wait());
-
-//var_dump($a->AvailableExchanges(new \Google\Protobuf\EmptyMessage())->wait());
-
-
+$txSecurities = new \PhpGrpc\TXSecurities($txSecuritiesHost);
+$txSecurities->search('tsl', 'ru');
