@@ -36,7 +36,7 @@ class TXSecurities
         /** @var /Grpc/UnaryCall $call */
         $call = $this->clientTXSecurities->Search($message, [], ['credentials' => null]);
         $call->wait();
-var_dump($call);
-        echo json_encode($this->clientTXSecurities->Search($message, [], ['credentials' => null])->wait());
+
+        echo json_encode($call->wait());
     }
 }

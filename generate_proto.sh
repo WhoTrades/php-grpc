@@ -17,6 +17,6 @@ protoc --proto_path=protos/grpc-proto/src/ \
        --proto_path=vendor/google/protobuf/src/ \
        --php_out=generated \
        --grpc_out=generated \
-       --plugin=protoc-gen-grpc=/home/vagrant/grpc/bins/opt/grpc_php_plugin \
+       --plugin=protoc-gen-grpc=/tmp/grpc/bins/opt/grpc_php_plugin \
 	$@
 
