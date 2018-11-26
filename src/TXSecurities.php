@@ -26,17 +26,41 @@ class TXSecurities
         $this->clientTXSecurities = new TXSecuritiesClientClient($hostname, ['credentials' => null]);
     }
 
-    public function search($query, $lang)
+    /**
+     * @param string | null $query
+     * @param int | null $lang
+     * @param int | null $limit
+     *
+     * @return \Grpc\Txsecurities\ClientSecurity[]
+     */
+    public function search($query, $lang = null, $limit = null)
     {
         $message = new SecuritiesSearchRequest();
-        $message->setLimit(10);
-        $message->setQuery($query);
-        //$message->setLang($lang);
+        if ($query) {
+            $message->setQuery($query);
+        }
+        if ($lang) {
+            $message->setLang($lang);
+        }
+        if ($limit) {
+            $message->setLimit($limit);
+        }
 
-        /** @var /Grpc/UnaryCall $call */
+        /** @var \Grpc\UnaryCall $call */
         $call = $this->clientTXSecurities->Search($message, [], ['credentials' => null]);
-        $call->wait();
+        /** @var \Grpc\Txsecurities\SecuritiesSearchResponse $reply */
+        list($reply, $status) = $call->wait();
+        /** @var \Google\Protobuf\Internal\RepeatedField $issueList */
+        $issueList = $reply->getIssues();
+        /** @var \Google\Protobuf\Internal\RepeatedFieldIter $issueListIterator */
+        $issueListIterator = $issueList->getIterator();
 
-        echo json_encode($call->wait());
+        $result = [];
+        /** @var \Grpc\Txsecurities\ClientSecurity $issue */
+        foreach ($issueListIterator as $issue) {
+            $result[] = $issue;
+        }
+
+        return $result;
     }
 }
