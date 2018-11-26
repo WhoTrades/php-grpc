@@ -33,7 +33,6 @@ bash -c "echo extension=protobuf.so > /etc/php/7.2/cli/conf.d/30-protobuf.ini"
 
 (cd /tmp/grpc/third_party/protobuf && ./autogen.sh && ./configure && make && sudo make install && ldconfig)
 
-(cd /tmp/grpc/examples/php && composer install)
-
-pecl install grpc
+(cd /tmp/grpc && git submodule update --init && make && sudo make install)
+(cd /tmp/grpc/src/php/ext/grpc && phpize && ./configure && make && sudo make install)
 bash -c 'echo "extension=grpc.so" > /etc/php/7.2/cli/conf.d/10-grpc.ini'
