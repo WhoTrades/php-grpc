@@ -67,8 +67,10 @@
   },
   "scripts": {
     "post-package-install": [
+      "bash generate.sh"
     ],
     "post-package-update": [
+      "bash generate.sh"
     ]
   }
 }
