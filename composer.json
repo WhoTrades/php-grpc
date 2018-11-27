@@ -2,8 +2,8 @@
   "name": "whotrades/php-grpc",
   "description": "PHP gRPC",
   "require": {
-    "grpc/grpc": "^v1.16.0",
-    "google/protobuf": "^v3.4.0"
+    "grpc/grpc": "^1.15.0",
+    "google/protobuf": "^v3.6.1"
   },
   "autoload": {
     "psr-4": {
