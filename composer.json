@@ -12,11 +12,11 @@
     }
   },
   "scripts": {
-    "post-install-cmd": [
+    "post-package-install": [
       "git submodule init && git submodule update",
       "bash generate.sh"
     ],
-    "post-update-cmd": [
+    "post-package-update": [
       "git submodule init && git submodule update",
       "bash generate.sh"
     ]
