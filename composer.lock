@@ -4,8 +4,48 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c2b3c113c49d239a205555a80d7d232",
+    "content-hash": "7b325c27ca31e7a12bafb50fd01a5e00",
     "packages": [
+        {
+            "name": "finam/grpc-marketdata",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://git.finam.ru/scm/ser/grpc-marketdata.git",
+                "reference": "master"
+            },
+            "type": "library"
+        },
+        {
+            "name": "finam/grpc-proto",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://git.finam.ru/scm/ser/grpc-proto.git",
+                "reference": "master"
+            },
+            "type": "library"
+        },
+        {
+            "name": "finam/grpc-transaq",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://git.finam.ru/scm/ser/grpc-transaq.git",
+                "reference": "master"
+            },
+            "type": "library"
+        },
+        {
+            "name": "finam/grpc-txsecurities",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://git.finam.ru/scm/ser/grpc-txsecurities.git",
+                "reference": "master"
+            },
+            "type": "library"
+        },
         {
             "name": "google/protobuf",
             "version": "v3.6.1",

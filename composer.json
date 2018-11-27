@@ -1,9 +1,63 @@
 {
   "name": "whotrades/php-grpc",
   "description": "PHP gRPC",
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "finam/grpc-txsecurities",
+        "version": "0.0.1",
+        "source": {
+          "url": "https://git.finam.ru/scm/ser/grpc-txsecurities.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "finam/grpc-marketdata",
+        "version": "0.0.1",
+        "source": {
+          "url": "https://git.finam.ru/scm/ser/grpc-marketdata.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "finam/grpc-proto",
+        "version": "0.0.1",
+        "source": {
+          "url": "https://git.finam.ru/scm/ser/grpc-proto.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "finam/grpc-transaq",
+        "version": "0.0.1",
+        "source": {
+          "url": "https://git.finam.ru/scm/ser/grpc-transaq.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
+    }
+  ],
   "require": {
     "grpc/grpc": "^1.15.0",
-    "google/protobuf": "^v3.6.1"
+    "google/protobuf": "^v3.6.1",
+    "finam/grpc-txsecurities": "^0.0.1",
+    "finam/grpc-marketdata": "^0.0.1",
+    "finam/grpc-proto": "^0.0.1",
+    "finam/grpc-transaq": "^0.0.1"
   },
   "autoload": {
     "psr-4": {
@@ -13,10 +67,8 @@
   },
   "scripts": {
     "post-package-install": [
-      "(git submodule init && git submodule update && bash generate.sh)"
     ],
     "post-package-update": [
-      "(git submodule init && git submodule update && bash generate.sh)"
     ]
   }
 }
