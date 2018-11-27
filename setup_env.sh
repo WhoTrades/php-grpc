@@ -26,6 +26,7 @@ apt-get install apt-transport-https software-properties-common lsb-release ca-ce
 cd /tmp && git clone -b v1.16.0 https://github.com/grpc/grpc
 
 (cd /tmp/grpc/ && git submodule update --init && make grpc_php_plugin)
+sudo cp /tmp/grpc/bins/opt/grpc_php_plugin /usr/local/bin/grpc_php_plugin
 
 (cd /tmp/grpc/third_party/protobuf/php/ext/google/protobuf && phpize && ./configure && make && sudo make install)
 cp /tmp/grpc/third_party/protobuf/php/ext/google/protobuf/.libs/protobuf.so /usr/lib/php/20170718/
