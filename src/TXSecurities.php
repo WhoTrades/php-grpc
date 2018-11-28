@@ -28,12 +28,12 @@ class TXSecurities
 
     /**
      * @param string | null $query
-     * @param int | null $lang
+     * @param int | null $lang // @see \Proto\Common\Lang::*
      * @param int | null $limit
      *
      * @return \Grpc\Txsecurities\ClientSecurity[]
      */
-    public function search($query, $lang = null, $limit = null)
+    public function search($query = null, $lang = null, $limit = null)
     {
         $message = new SecuritiesSearchRequest();
         if ($query) {
