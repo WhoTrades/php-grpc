@@ -36,6 +36,8 @@ class MDStream
      */
     public function getQuotesByFinamId($finamId)
     {
+        $result = [];
+
         $message = new SubscribeQuotesRequest();
         $message->setSecurities([(new TaggedSecurity())->setId((new SecurityIdentifier())->setSecurityId($finamId))]);
 
@@ -44,12 +46,11 @@ class MDStream
         $call->write($message);
 
         /** @var $response SubscribeQuotesResponse */
-        $response = $call->read();
-
-        $result = [];
-        /** @var $val SubscribeQuotesResponse\Response */
-        foreach ($response->getQuotes()->getIterator() as $val) {
-            $result[] = $val->getQuote();
+        if ($response = $call->read()) {
+            /** @var $val SubscribeQuotesResponse\Response */
+            foreach ($response->getQuotes()->getIterator() as $val) {
+                $result[] = $val->getQuote();
+            }
         }
 
         return $result;
