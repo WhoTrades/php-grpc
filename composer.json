@@ -49,6 +49,18 @@
           "reference": "master"
         }
       }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "finam/grpc-txauth",
+        "version": "0.0.1",
+        "source": {
+          "url": "https://git.finam.ru/scm/ser/grpc-txauth.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
     }
   ],
   "require": {
