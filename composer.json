@@ -69,7 +69,8 @@
     "finam/grpc-txsecurities": "^0.0.1",
     "finam/grpc-marketdata": "^0.0.1",
     "finam/grpc-proto": "^0.0.1",
-    "finam/grpc-transaq": "^0.0.1"
+    "finam/grpc-transaq": "^0.0.1",
+    "finam/grpc-txauth": "^0.0.1"
   },
   "autoload": {
     "psr-4": {
