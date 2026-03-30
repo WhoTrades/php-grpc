@@ -65,7 +65,7 @@
   ],
   "require": {
     "grpc/grpc": "^1.15.0",
-    "google/protobuf": "^v3.6.1",
+    "google/protobuf": "^v4.33.6",
     "finam/grpc-txsecurities": "^0.0.1",
     "finam/grpc-marketdata": "^0.0.1",
     "finam/grpc-proto": "^0.0.1",
